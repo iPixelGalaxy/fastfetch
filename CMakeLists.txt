@@ -23,8 +23,53 @@ message(STATUS "Build for system processor: ${CMAKE_SYSTEM_PROCESSOR}")
 ###################
 # Target Platform #
 ###################
+option(FASTFETCH_IOS "Build fastfetch for jailbroken iOS/iPadOS" OFF)
+if(FASTFETCH_IOS)
+    set(MODULE_DISABLE_BATTERY ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_BLUETOOTH ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_BLUETOOTHRADIO ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_BRIGHTNESS ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_CAMERA ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_DNS ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_FONT ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_GPU ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_GAMEPAD ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_KEYBOARD ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_LOCALIP ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_MOUSE ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_OPENCL ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_OPENGL ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_PHYSICALDISK ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_POWERADAPTER ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_SOUND ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_WM ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_WIFI ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_DISKIO ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_NETIO ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_ZPOOL ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_COMMAND ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_EDITOR ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_TERMINALFONT ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_WALLPAPER ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_INITSYSTEM ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_SHELL ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_TERMINAL ON CACHE BOOL "" FORCE)
+endif()
+
+
+if(FASTFETCH_IOS)
+    set(MODULE_DISABLE_OPENCL ON CACHE BOOL "" FORCE)
+    set(MODULE_DISABLE_OPENGL ON CACHE BOOL "" FORCE)
+    set(ENABLE_OPENCL OFF CACHE BOOL "" FORCE)
+    set(ENABLE_GLX OFF CACHE BOOL "" FORCE)
+    set(ENABLE_EGL OFF CACHE BOOL "" FORCE)
+endif()
+
 if(ANDROID)
     set(LINUX FALSE)
+elseif(FASTFETCH_IOS)
+    message(STATUS "Fastfetch: jailbroken iOS/iPadOS compatibility enabled")
+    set(IOS TRUE CACHE BOOL "..." FORCE)
 elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
     set(LINUX TRUE CACHE BOOL "..." FORCE) # LINUX means GNU/Linux, not just the kernel
 elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
@@ -430,8 +475,7 @@ set(LIBFASTFETCH_SRC
     src/common/impl/FFstrbuf.c
     src/common/impl/path.c
     src/common/impl/FFPlatform.c
-    src/common/impl/smbios.c
-    src/common/impl/strutil.c
+        src/common/impl/strutil.c
     src/detection/bluetoothradio/bluetoothradio.c
     src/detection/bootmgr/bootmgr.c
     src/detection/chassis/chassis.c
@@ -451,7 +495,6 @@ set(LIBFASTFETCH_SRC
     src/detection/media/media.c
     src/detection/netio/netio.c
     src/detection/opencl/opencl.c
-    src/detection/opengl/opengl_shared.c
     src/detection/os/os.c
     src/detection/packages/packages.c
     src/detection/physicalmemory/physicalmemory.c
@@ -599,8 +642,7 @@ if(LINUX)
         src/detection/gtk_qt/gtk.c
         src/detection/host/host_linux.c
         src/detection/icons/icons_linux.c
-        src/detection/initsystem/initsystem_linux.c
-        src/detection/keyboard/keyboard_linux.c
+                src/detection/keyboard/keyboard_linux.c
         src/detection/libc/libc_linux.c
         src/detection/lm/lm_linux.c
         src/detection/loadavg/loadavg_linux.c
@@ -611,7 +653,6 @@ if(LINUX)
         src/detection/memory/memory_linux.c
         src/detection/mouse/mouse_linux.c
         src/detection/netio/netio_linux.c
-        src/detection/opengl/opengl_linux.c
         src/detection/os/os_linux.c
         src/detection/packages/packages_linux.c
         src/detection/packages/packages_nix.c
@@ -621,8 +662,7 @@ if(LINUX)
         src/detection/sound/sound_linux.c
         src/detection/swap/swap_linux.c
         src/detection/terminalfont/terminalfont_linux.c
-        src/detection/terminalshell/terminalshell_linux.c
-        src/detection/terminalsize/terminalsize_linux.c
+                src/detection/terminalsize/terminalsize_linux.c
         src/detection/theme/theme_linux.c
         src/detection/tpm/tpm_linux.c
         src/detection/uptime/uptime_linux.c
@@ -674,8 +714,7 @@ elseif(ANDROID)
         src/detection/gpu/gpu_android.c
         src/detection/host/host_android.c
         src/detection/icons/icons_linux.c
-        src/detection/initsystem/initsystem_linux.c
-        src/detection/keyboard/keyboard_nosupport.c
+                src/detection/keyboard/keyboard_nosupport.c
         src/detection/libc/libc_android.c
         src/detection/lm/lm_nosupport.c
         src/detection/loadavg/loadavg_linux.c
@@ -686,7 +725,6 @@ elseif(ANDROID)
         src/detection/memory/memory_linux.c
         src/detection/mouse/mouse_nosupport.c
         src/detection/netio/netio_linux.c
-        src/detection/opengl/opengl_linux.c
         src/detection/os/os_android.c
         src/detection/packages/packages_linux.c
         src/detection/packages/packages_nix.c
@@ -696,8 +734,7 @@ elseif(ANDROID)
         src/detection/swap/swap_linux.c
         src/detection/terminalfont/terminalfont_android.c
         src/detection/terminalfont/terminalfont_linux.c
-        src/detection/terminalshell/terminalshell_linux.c
-        src/detection/terminalsize/terminalsize_linux.c
+                src/detection/terminalsize/terminalsize_linux.c
         src/detection/theme/theme_linux.c
         src/detection/tpm/tpm_nosupport.c
         src/detection/uptime/uptime_linux.c
@@ -760,8 +797,7 @@ elseif(FreeBSD)
         src/detection/host/host_bsd.c
         src/detection/lm/lm_linux.c
         src/detection/icons/icons_linux.c
-        src/detection/initsystem/initsystem_linux.c
-        src/detection/keyboard/keyboard_bsd.c
+                src/detection/keyboard/keyboard_bsd.c
         src/detection/libc/libc_bsd.c
         src/detection/loadavg/loadavg_bsd.c
         src/detection/locale/locale_linux.c
@@ -771,7 +807,6 @@ elseif(FreeBSD)
         src/detection/memory/memory_bsd.c
         src/detection/mouse/mouse_bsd.c
         src/detection/netio/netio_bsd.c
-        src/detection/opengl/opengl_linux.c
         src/detection/os/os_linux.c
         src/detection/packages/packages_bsd.c
         src/detection/poweradapter/poweradapter_nosupport.c
@@ -780,8 +815,7 @@ elseif(FreeBSD)
         src/detection/sound/sound_bsd.c
         src/detection/swap/swap_bsd.c
         src/detection/terminalfont/terminalfont_linux.c
-        src/detection/terminalshell/terminalshell_linux.c
-        src/detection/terminalsize/terminalsize_linux.c
+                src/detection/terminalsize/terminalsize_linux.c
         src/detection/theme/theme_linux.c
         src/detection/tpm/tpm_bsd.c
         src/detection/uptime/uptime_bsd.c
@@ -853,8 +887,7 @@ elseif(NetBSD)
         src/detection/host/host_nbsd.c
         src/detection/lm/lm_linux.c
         src/detection/icons/icons_linux.c
-        src/detection/initsystem/initsystem_linux.c
-        src/detection/keyboard/keyboard_nosupport.c
+                src/detection/keyboard/keyboard_nosupport.c
         src/detection/libc/libc_nosupport.c
         src/detection/loadavg/loadavg_bsd.c
         src/detection/locale/locale_linux.c
@@ -864,7 +897,6 @@ elseif(NetBSD)
         src/detection/memory/memory_nbsd.c
         src/detection/mouse/mouse_nosupport.c
         src/detection/netio/netio_bsd.c
-        src/detection/opengl/opengl_linux.c
         src/detection/os/os_nbsd.c
         src/detection/packages/packages_nbsd.c
         src/detection/poweradapter/poweradapter_nosupport.c
@@ -873,8 +905,7 @@ elseif(NetBSD)
         src/detection/sound/sound_nbsd.c
         src/detection/swap/swap_obsd.c
         src/detection/terminalfont/terminalfont_linux.c
-        src/detection/terminalshell/terminalshell_linux.c
-        src/detection/terminalsize/terminalsize_linux.c
+                src/detection/terminalsize/terminalsize_linux.c
         src/detection/theme/theme_linux.c
         src/detection/tpm/tpm_nosupport.c
         src/detection/uptime/uptime_bsd.c
@@ -896,8 +927,7 @@ elseif(OpenBSD)
         src/common/impl/sysctl.c
         src/common/impl/FFPlatform_unix.c
         src/common/impl/binary_linux.c
-        src/common/impl/smbios.c
-        src/common/impl/kmod_nosupport.c
+                src/common/impl/kmod_nosupport.c
         src/detection/battery/battery_obsd.c
         src/detection/bios/bios_windows.c
         src/detection/bluetooth/bluetooth_nosupport.c
@@ -939,8 +969,7 @@ elseif(OpenBSD)
         src/detection/host/host_obsd.c
         src/detection/lm/lm_nosupport.c
         src/detection/icons/icons_linux.c
-        src/detection/initsystem/initsystem_linux.c
-        src/detection/keyboard/keyboard_nosupport.c
+                src/detection/keyboard/keyboard_nosupport.c
         src/detection/libc/libc_nosupport.c
         src/detection/loadavg/loadavg_bsd.c
         src/detection/locale/locale_linux.c
@@ -950,7 +979,6 @@ elseif(OpenBSD)
         src/detection/memory/memory_obsd.c
         src/detection/mouse/mouse_nosupport.c
         src/detection/netio/netio_bsd.c
-        src/detection/opengl/opengl_linux.c
         src/detection/os/os_obsd.c
         src/detection/packages/packages_obsd.c
         src/detection/poweradapter/poweradapter_nosupport.c
@@ -959,8 +987,7 @@ elseif(OpenBSD)
         src/detection/sound/sound_obsd.c
         src/detection/swap/swap_obsd.c
         src/detection/terminalfont/terminalfont_linux.c
-        src/detection/terminalshell/terminalshell_linux.c
-        src/detection/terminalsize/terminalsize_linux.c
+                src/detection/terminalsize/terminalsize_linux.c
         src/detection/theme/theme_linux.c
         src/detection/tpm/tpm_nosupport.c
         src/detection/uptime/uptime_bsd.c
@@ -981,20 +1008,15 @@ elseif(APPLE)
         src/common/impl/sysctl.c
         src/common/impl/FFPlatform_unix.c
         src/common/impl/binary_apple.c
-        src/common/impl/kmod_apple.c
-        src/common/apple/cf_helpers.c
-        src/common/apple/osascript.m
-        src/common/apple/smc_temps.c
-        src/common/apple/version.m
+                src/common/apple/cf_helpers.c
+                        src/common/apple/version.m
         src/detection/battery/battery_apple.c
         src/detection/bluetooth/bluetooth_apple.m
         src/detection/bluetoothradio/bluetoothradio_apple.m
-        src/detection/bootmgr/bootmgr_apple.c
-        src/detection/brightness/brightness_apple.c
+                src/detection/brightness/brightness_apple.c
         src/detection/btrfs/btrfs_nosupport.c
         src/detection/codec/codec_apple.c
-        src/detection/cpu/cpu_apple.c
-        src/detection/cpucache/cpucache_apple.c
+                src/detection/cpucache/cpucache_apple.c
         src/detection/cpuusage/cpuusage_apple.c
         src/detection/cursor/cursor_apple.m
         src/detection/disk/disk_bsd.c
@@ -1006,19 +1028,16 @@ elseif(APPLE)
         src/detection/gpu/gpu_apple.c
         src/detection/gpu/gpu_apple.m
         src/detection/icons/icons_nosupport.c
-        src/detection/initsystem/initsystem_linux.c
-        src/detection/keyboard/keyboard_apple.c
+                src/detection/keyboard/keyboard_apple.c
         src/detection/lm/lm_nosupport.c
         src/detection/loadavg/loadavg_bsd.c
         src/detection/libc/libc_apple.c
         src/detection/locale/locale_linux.c
         src/detection/localip/localip_linux.c
         src/detection/gamepad/gamepad_apple.c
-        src/detection/media/media_apple.m
-        src/detection/memory/memory_apple.c
+                src/detection/memory/memory_apple.c
         src/detection/mouse/mouse_apple.c
         src/detection/netio/netio_apple.c
-        src/detection/opengl/opengl_apple.c
         src/detection/os/os_apple.m
         src/detection/packages/packages_apple.c
         src/detection/packages/packages_nix.c
@@ -1026,15 +1045,11 @@ elseif(APPLE)
         src/detection/processes/processes_bsd.c
         src/detection/sound/sound_apple.c
         src/detection/swap/swap_apple.c
-        src/detection/terminalfont/terminalfont_apple.m
-        src/detection/terminalshell/terminalshell_linux.c
-        src/detection/terminalsize/terminalsize_linux.c
+                        src/detection/terminalsize/terminalsize_linux.c
         src/detection/theme/theme_apple.c
-        src/detection/tpm/tpm_apple.c
-        src/detection/uptime/uptime_bsd.c
+                src/detection/uptime/uptime_bsd.c
         src/detection/users/users_linux.c
-        src/detection/wallpaper/wallpaper_apple.m
-        src/detection/wifi/wifi_apple.m
+                src/detection/wifi/wifi_apple.m
         src/detection/wm/wm_apple.m
         src/detection/de/de_nosupport.c
         src/detection/wmtheme/wmtheme_apple.m
@@ -1051,12 +1066,8 @@ elseif(APPLE)
         )
     else()
         list(APPEND LIBFASTFETCH_SRC
-            src/detection/bios/bios_apple.c
-            src/detection/board/board_apple.c
-            src/detection/chassis/chassis_apple.c
-            src/detection/host/host_apple.c
-            src/detection/physicalmemory/physicalmemory_apple.m
-        )
+                                    src/detection/chassis/chassis_apple.c
+                                )
     endif()
 elseif(WIN32)
     list(APPEND LIBFASTFETCH_SRC
@@ -1180,8 +1191,7 @@ elseif(SunOS)
         src/detection/gtk_qt/gtk.c
         src/detection/host/host_windows.c
         src/detection/icons/icons_linux.c
-        src/detection/initsystem/initsystem_linux.c
-        src/detection/keyboard/keyboard_nosupport.c
+                src/detection/keyboard/keyboard_nosupport.c
         src/detection/libc/libc_nosupport.c
         src/detection/lm/lm_nosupport.c
         src/detection/loadavg/loadavg_sunos.c
@@ -1192,7 +1202,6 @@ elseif(SunOS)
         src/detection/memory/memory_sunos.c
         src/detection/mouse/mouse_nosupport.c
         src/detection/netio/netio_sunos.c
-        src/detection/opengl/opengl_linux.c
         src/detection/os/os_sunos.c
         src/detection/packages/packages_sunos.c
         src/detection/poweradapter/poweradapter_nosupport.c
@@ -1201,8 +1210,7 @@ elseif(SunOS)
         src/detection/sound/sound_sunos.c
         src/detection/swap/swap_sunos.c
         src/detection/terminalfont/terminalfont_linux.c
-        src/detection/terminalshell/terminalshell_linux.c
-        src/detection/terminalsize/terminalsize_linux.c
+                src/detection/terminalsize/terminalsize_linux.c
         src/detection/theme/theme_linux.c
         src/detection/tpm/tpm_nosupport.c
         src/detection/uptime/uptime_sunos.c
@@ -1272,8 +1280,7 @@ elseif(Haiku)
         src/detection/sound/sound_haiku.cpp
         src/detection/swap/swap_haiku.c
         src/detection/terminalfont/terminalfont_linux.c
-        src/detection/terminalshell/terminalshell_linux.c
-        src/detection/terminalsize/terminalsize_linux.c
+                src/detection/terminalsize/terminalsize_linux.c
         src/detection/theme/theme_nosupport.c
         src/detection/tpm/tpm_nosupport.c
         src/detection/uptime/uptime_haiku.c
@@ -1327,8 +1334,7 @@ elseif(GNU)
         src/detection/gtk_qt/gtk.c
         src/detection/host/host_nosupport.c
         src/detection/icons/icons_linux.c
-        src/detection/initsystem/initsystem_linux.c
-        src/detection/keyboard/keyboard_nosupport.c
+                src/detection/keyboard/keyboard_nosupport.c
         src/detection/libc/libc_linux.c
         src/detection/lm/lm_linux.c
         src/detection/loadavg/loadavg_linux.c
@@ -1339,7 +1345,6 @@ elseif(GNU)
         src/detection/memory/memory_linux.c
         src/detection/mouse/mouse_nosupport.c
         src/detection/netio/netio_nosupport.c
-        src/detection/opengl/opengl_linux.c
         src/detection/os/os_linux.c
         src/detection/packages/packages_linux.c
         src/detection/packages/packages_nix.c
@@ -1349,8 +1354,7 @@ elseif(GNU)
         src/detection/sound/sound_linux.c
         src/detection/swap/swap_linux.c
         src/detection/terminalfont/terminalfont_linux.c
-        src/detection/terminalshell/terminalshell_linux.c
-        src/detection/terminalsize/terminalsize_linux.c
+                src/detection/terminalsize/terminalsize_linux.c
         src/detection/theme/theme_linux.c
         src/detection/tpm/tpm_nosupport.c
         src/detection/uptime/uptime_linux.c
@@ -1410,6 +1414,38 @@ else()
         src/3rdparty/yyjson/yyjson.c
     )
 endif()
+
+
+if(FASTFETCH_IOS)
+    list(REMOVE_ITEM LIBFASTFETCH_SRC
+        src/detection/opencl/opencl.c
+        src/common/impl/netif_apple.c
+        src/common/impl/processing_linux.c
+        src/detection/battery/battery_apple.c
+        src/detection/bluetooth/bluetooth_apple.m
+        src/detection/bluetoothradio/bluetoothradio_apple.m
+        src/detection/brightness/brightness_apple.c
+        src/detection/dns/dns_apple.c
+        src/detection/physicaldisk/physicaldisk_apple.c
+        src/detection/diskio/diskio_apple.c
+        src/detection/displayserver/displayserver_apple.c
+        src/detection/font/font_apple.m
+        src/detection/gpu/gpu_apple.c
+        src/detection/gpu/gpu_apple.m
+        src/detection/keyboard/keyboard_apple.c
+        src/detection/localip/localip_linux.c
+        src/detection/gamepad/gamepad_apple.c
+        src/detection/mouse/mouse_apple.c
+        src/detection/netio/netio_apple.c
+        src/detection/poweradapter/poweradapter_apple.c
+        src/detection/sound/sound_apple.c
+        src/detection/wifi/wifi_apple.m
+        src/detection/wm/wm_apple.m
+        src/detection/camera/camera_apple.m
+    )
+endif()
+
+list(APPEND LIBFASTFETCH_SRC src/ios_stubs.c)
 
 add_library(libfastfetch OBJECT
     ${LIBFASTFETCH_SRC}
@@ -1840,24 +1876,20 @@ if(LINUX)
 elseif(APPLE)
     target_link_libraries(libfastfetch
         PRIVATE "-framework AVFoundation"
-        PRIVATE "-framework Cocoa"
+        PRIVATE ""
         PRIVATE "-framework CoreFoundation"
-        PRIVATE "-framework CoreAudio"
+        PRIVATE ""
         PRIVATE "-framework CoreMedia"
         PRIVATE "-framework CoreVideo"
-        PRIVATE "-framework CoreWLAN"
-        PRIVATE "-framework IOBluetooth"
-        PRIVATE "-framework IOKit"
+        PRIVATE ""
+        PRIVATE ""
+        PRIVATE ""
         PRIVATE "-framework Metal"
-        PRIVATE "-framework OpenGL"
-        PRIVATE "-framework OpenCL"
-        PRIVATE "-framework SystemConfiguration"
+        PRIVATE ""
+        PRIVATE ""
+        PRIVATE ""
         PRIVATE "-framework VideoToolbox"
-        PRIVATE "-weak_framework CoreDisplay"
 
-        PRIVATE "-F /System/Library/PrivateFrameworks"
-        PRIVATE "-weak_framework DisplayServices"
-        PRIVATE "-weak_framework MediaRemote"
     )
 elseif(WIN32)
     target_link_libraries(libfastfetch

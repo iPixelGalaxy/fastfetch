@@ -13,11 +13,9 @@
     #include <sys/select.h>
 #endif
 
-#if FF_HAVE_WORDEXP
-    #include <wordexp.h>
-#else
+
     #include <glob.h>
-#endif
+
 
 static void createSubfolders(const char* fileName) {
     FF_STRBUF_AUTO_DESTROY path = ffStrbufCreate();
@@ -91,48 +89,11 @@ bool ffAppendFDBuffer(int fd, FFstrbuf* buffer) {
     return buffer->length > 0;
 }
 
-bool ffPathExpandEnv(const char* in, FFstrbuf* out) {
-    bool result = false;
-
-#if FF_HAVE_WORDEXP
-
-    wordexp_t exp;
-    if (wordexp(in, &exp, 0) != 0) { // WARN: 0 = no safety flags; command substitution allowed
-        return false;
-    }
-
-    if (exp.we_wordc >= 1) {
-        result = true;
-        ffStrbufSetS(out, exp.we_wordv[exp.we_wordc > 1 ? ffTimeGetNow() % exp.we_wordc : 0]);
-    }
-
-    wordfree(&exp);
-
-#else
-
-    glob_t gb;
-    if (glob(in, GLOB_NOSORT
-    #ifdef GLOB_TILDE
-                | GLOB_TILDE
-    #endif
-    #ifdef GLOB_BRACE
-                | GLOB_BRACE
-    #endif
-            ,
-            NULL,
-            &gb) != 0)
-        return false;
-
-    if (gb.gl_pathc >= 1) {
-        result = true;
-        ffStrbufSetS(out, gb.gl_pathv[gb.gl_pathc > 1 ? ffTimeGetNow() % (unsigned) gb.gl_pathc : 0]);
-    }
-
-    globfree(&gb);
-
-#endif
-
-    return result;
+bool ffPathExpandEnv(const char* in, FFstrbuf* out)
+{
+    /* iOS: wordexp() is unavailable; use raw path unchanged. */
+    ffStrbufSetS(out, in);
+    return true;
 }
 
 static int ftty = -1;
